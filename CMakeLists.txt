@@ -17,8 +17,8 @@ find_program(GNU_MAKE_EXECUTABLE
     DOC "GNU Make executable used to build LuaJIT"
 )
 
-if(NOT EXISTS "${CMAKE_SOURCE_DIR}/Makefile")
-    message(FATAL_ERROR "LuaJIT Makefile not found in: ${CMAKE_SOURCE_DIR}")
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Makefile")
+    message(FATAL_ERROR "LuaJIT Makefile not found in: ${CMAKE_CURRENT_SOURCE_DIR}")
 endif()
 
 set(LUAJIT_STAMP "${CMAKE_BINARY_DIR}/luajit-build.stamp")
@@ -26,12 +26,12 @@ set(LUAJIT_STAMP "${CMAKE_BINARY_DIR}/luajit-build.stamp")
 add_custom_command(
     OUTPUT "${LUAJIT_STAMP}"
     COMMAND "${CMAKE_COMMAND}" -E echo "Building LuaJIT via Makefile..."
-    COMMAND "${GNU_MAKE_EXECUTABLE}" -C "${CMAKE_SOURCE_DIR}"
+    COMMAND "${GNU_MAKE_EXECUTABLE}" -C "${CMAKE_CURRENT_SOURCE_DIR}"
     COMMAND "${CMAKE_COMMAND}" -E touch "${LUAJIT_STAMP}"
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     DEPENDS
-        "${CMAKE_SOURCE_DIR}/Makefile"
-        "${CMAKE_SOURCE_DIR}/src/Makefile"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Makefile"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/Makefile"
     VERBATIM
 )
 
@@ -41,14 +41,14 @@ add_custom_target(luajit-build ALL
 
 if(LUAJIT_ENABLE_AMALGAMATION)
     add_custom_target(luajit-amalg
-        COMMAND "${GNU_MAKE_EXECUTABLE}" -C "${CMAKE_SOURCE_DIR}" amalg
-        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+        COMMAND "${GNU_MAKE_EXECUTABLE}" -C "${CMAKE_CURRENT_SOURCE_DIR}" amalg
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
         VERBATIM
     )
 endif()
 
 function(luajit_make_install target_name make_goal)
-    set(cmd "${GNU_MAKE_EXECUTABLE}" -C "${CMAKE_SOURCE_DIR}" "${make_goal}"
+    set(cmd "${GNU_MAKE_EXECUTABLE}" -C "${CMAKE_CURRENT_SOURCE_DIR}" "${make_goal}"
         PREFIX="${LUAJIT_PREFIX}"
         MULTILIB="${LUAJIT_MULTILIB}"
     )
@@ -59,7 +59,7 @@ function(luajit_make_install target_name make_goal)
 
     add_custom_target(${target_name}
         COMMAND ${cmd}
-        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
         VERBATIM
     )
 endfunction()
@@ -69,9 +69,9 @@ if(LUAJIT_ENABLE_INSTALL_TARGETS)
     luajit_make_install(luajit-uninstall uninstall)
 endif()
 
-set(LUAJIT_LIB "${CMAKE_SOURCE_DIR}/src/libluajit.so")
-set(LUAJIT_BIN "${CMAKE_SOURCE_DIR}/src/luajit")
-set(LUAJIT_INCLUDE "${CMAKE_SOURCE_DIR}/src")
+set(LUAJIT_LIB "${CMAKE_CURRENT_SOURCE_DIR}/src/libluajit.so")
+set(LUAJIT_BIN "${CMAKE_CURRENT_SOURCE_DIR}/src/luajit")
+set(LUAJIT_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 add_library(LuaJIT::LuaJIT SHARED IMPORTED GLOBAL)
 
