@@ -21,22 +21,23 @@ if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Makefile")
     message(FATAL_ERROR "LuaJIT Makefile not found in: ${CMAKE_CURRENT_SOURCE_DIR}")
 endif()
 
-set(LUAJIT_STAMP "${CMAKE_BINARY_DIR}/luajit-build.stamp")
+set(LUAJIT_LIB "${CMAKE_CURRENT_SOURCE_DIR}/src/libluajit.so")
+set(LUAJIT_BIN "${CMAKE_CURRENT_SOURCE_DIR}/src/luajit")
+set(LUAJIT_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 add_custom_command(
-    OUTPUT "${LUAJIT_STAMP}"
-    COMMAND "${CMAKE_COMMAND}" -E echo "Building LuaJIT via Makefile..."
+    OUTPUT "${LUAJIT_LIB}" "${LUAJIT_BIN}"
     COMMAND "${GNU_MAKE_EXECUTABLE}" -C "${CMAKE_CURRENT_SOURCE_DIR}"
-    COMMAND "${CMAKE_COMMAND}" -E touch "${LUAJIT_STAMP}"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     DEPENDS
         "${CMAKE_CURRENT_SOURCE_DIR}/Makefile"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Makefile"
+    COMMENT "Building LuaJIT..."
     VERBATIM
 )
 
 add_custom_target(luajit-build ALL
-    DEPENDS "${LUAJIT_STAMP}"
+    DEPENDS "${LUAJIT_LIB}" "${LUAJIT_BIN}"
 )
 
 if(LUAJIT_ENABLE_AMALGAMATION)
@@ -69,18 +70,12 @@ if(LUAJIT_ENABLE_INSTALL_TARGETS)
     luajit_make_install(luajit-uninstall uninstall)
 endif()
 
-set(LUAJIT_LIB "${CMAKE_CURRENT_SOURCE_DIR}/src/libluajit.so")
-set(LUAJIT_BIN "${CMAKE_CURRENT_SOURCE_DIR}/src/luajit")
-set(LUAJIT_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src")
-
 add_library(LuaJIT::LuaJIT SHARED IMPORTED GLOBAL)
 
 set_target_properties(LuaJIT::LuaJIT PROPERTIES
     IMPORTED_LOCATION "${LUAJIT_LIB}"
     INTERFACE_INCLUDE_DIRECTORIES "${LUAJIT_INCLUDE}"
 )
-
-add_dependencies(LuaJIT::LuaJIT luajit-build)
 
 add_library(LuaJIT ALIAS LuaJIT::LuaJIT)
 
