@@ -82,13 +82,7 @@ set_target_properties(LuaJIT::LuaJIT PROPERTIES
 
 add_dependencies(LuaJIT::LuaJIT luajit-build)
 
-add_library(LuaJIT INTERFACE)
-
-target_include_directories(LuaJIT INTERFACE
-    "${LUAJIT_INCLUDE}"
-)
-
-target_link_libraries(LuaJIT INTERFACE LuaJIT::LuaJIT)
+add_library(LuaJIT ALIAS LuaJIT::LuaJIT)
 
 install(CODE [[
     message(STATUS "LuaJIT is built via Makefile; use luajit-install target for system install.")
